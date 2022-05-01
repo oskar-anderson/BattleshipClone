@@ -1,0 +1,163 @@
+@page "/battleship"
+@using Game
+@using Domain.Model
+@using Domain.Model.Api
+@using Domain
+@using Domain.Tile
+<h3>Canvas</h3>
+@inject IJSRuntime jsRuntime;
+@implements IDisposable
+
+@code {
+
+    BaseBattleship game = new BlazorBattle(
+        10,
+        10,
+        "1x5N1; 1x4N2; 1x3N3; 1x2N4",
+        2,
+        -1,
+        -1
+        );
+    
+    public TileData.CharInfo[,]? DrawArea = null;
+    
+    public bool needToExit;
+    public Input? CleanInput = null;
+    public ElementReference GameBoardDiv;  // set by the @ref attribute
+
+    
+    public async void Run()
+    {
+        var prevFrameTime = DateTime.Now;
+        while (game.GameData.ElapsedTime < 9000) {
+            if (needToExit)
+            {
+                throw new Exception("Game exited!");
+            }
+            double deltaTime = (DateTime.Now - prevFrameTime).TotalSeconds;
+            prevFrameTime = DateTime.Now;
+            if (CleanInput != null && CleanInput.Keyboard.KeyboardState.Find(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowUp.Key)!.Values.Count == 2)
+            {
+                Console.WriteLine("x: " + game.GameData.ActivePlayer.Sprite.Pos.X + " y:" + game.GameData.ActivePlayer.Sprite.Pos.Y);
+            }
+            game.GameData.Input = CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput();
+            CleanInput = null;
+            new BlazorUpdateLogic(game.GameData.Input).Update(deltaTime, game);
+            DrawArea = BlazorDrawLogic.GetDraw(deltaTime, game.GameData);
+            StateHasChanged();
+            await Task.Delay(Math.Max(1000 / 60 - (int) (deltaTime * 1000), 1));
+        }
+    }
+    
+    protected override Task OnInitializedAsync()
+    {
+        DrawArea = BlazorDrawLogic.GetDraw(0.0f, game.GameData);
+        Run();
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GameBoardDiv.FocusAsync();
+            // await jsRuntime.InvokeVoidAsync("JsFunctions.addKeyboardEventListener");
+        }
+        return Task.CompletedTask;
+    }
+
+    public void KeyDown(KeyboardEventArgs e)
+    {
+        CleanInput = Input.GetDefaultInput();
+        var supportedKeyboardEventCodes = (from x in Input.GetDefaultInput().Keyboard.KeyboardState select x.Identifier.Key).ToList();
+        if (! supportedKeyboardEventCodes.Contains(e.Code))
+        {
+            return;
+        }
+        Console.WriteLine(e.Code);
+        CleanInput.Keyboard.KeyboardState.Find(
+            x => x.Identifier.Key == e.Code)!
+            .Values = new List<Input.BtnState>()
+            {
+                Input.BtnState.Pressed, Input.BtnState.Echo
+            };
+    }
+
+    public void Dispose()
+    {
+        needToExit = true;
+    }
+
+}
+
+<div class="main">
+    <h2>Battleship</h2>
+    <div>
+        FrameCount: @game.GameData.FrameCount
+    </div>
+
+
+    
+        @if(game.GameData.State == GameState.GameOver) 
+        {
+            <div>
+                <h3>Game Over! @game.GameData.ActivePlayer.Name Won!</h3>
+                <p style="text-align: center">
+                    <a onclick="renderByName('StartMenu')">Try Again</a>
+                </p>
+            </div>
+        } else {
+            <h3>@game.GameData.ActivePlayer.Name turn</h3>
+        }
+    
+
+
+
+    <form method="post">
+        <div class="container" tabindex="0" @onkeydown="KeyDown" @onkeydown:preventDefault @ref="GameBoardDiv">
+            <div class="row">
+                <div id="board" class="col capsizedText PressStart2PFont" style="font-size: 16px; line-height: 16px; padding: 0;">
+                    @{
+                    var ColorIntToCssString = new Dictionary<int, string>()
+                    {
+                        { 0, "rgb(12,     12,     12 )" },             // Black
+                        { 1, "rgb(0,      55,     218) " },            // DarkBlue
+                        { 2, "rgb(19,     161,    14  )" },            // DarkGreen
+                        { 3, "rgb(58,     150,    221) " },            // DarkCyan
+                        { 4, "rgb(197,    15,     31  )" },            // DarkRed
+                        { 5, "rgb(136,    23,     152) " },            // DarkMagenta
+                        { 6, "rgb(193,    156,    0  )" },             // DarkYellow
+                        { 7, "rgb(204,    204,    204) " },            // Gray
+                        { 8, "rgb(118,    118,    118) " },            // DarkGrey
+                        { 9, "rgb(59,     120,    255) " },            // Blue
+                        { 10, "rgb(22,    192,    12  )" },            // Green
+                        { 11, "rgb(97,    214,    214) " },            // Cyan
+                        { 12, "rgb(231,   72,     86  )" },            // Red
+                        { 13, "rgb(180,   0,      158) " },            // Magenta
+                        { 14, "rgb(249,   241,    165) " },            // Yellow
+                        { 15, "rgb(242,   242,    242) " }             // White
+                    };
+                    
+                    for (int y = 0; y < DrawArea.GetHeight(); y++)
+                    {
+                    <p style="display: flex; margin-top: 0; margin-bottom: 0;">
+                        @for (int x = 0; x < DrawArea.GetWidth(); x++)
+                        {
+                            var charInfo = DrawArea[y, x];
+                            var colCss = ColorIntToCssString[charInfo.Color.IntVal];
+                            var character = charInfo.Glyph;
+                            character = character == ' ' ? '.' : character;
+                            <em style="color: @colCss;">@character</em>
+                        }
+                    </p>
+                    }
+                    }
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+
+    </form>
+
+</div>

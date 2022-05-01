@@ -153,7 +153,7 @@ namespace Domain.Model
             public class KeyboardKey
             {
                 public KeyboardIdentifier Identifier { get; set; } = null!;
-                public List<BtnState> Values { get; set; } = null!;
+                public List<BtnState> Values { get; set; } = new();
             }
     
             public class KeyboardIdentifier
@@ -285,6 +285,43 @@ namespace Domain.Model
                     Unicode = 188,
                 };
 
+
+                public static Input GetDefaultInput()
+                {
+                    return new Input()
+                    {
+                        Keyboard = new KeyboardInput()
+                        {
+                            KeyboardState = new List<KeyboardKey>()
+                            {
+                                new KeyboardKey() {Identifier = KeyR},
+                                new KeyboardKey() {Identifier = KeyX},
+                                new KeyboardKey() {Identifier = Escape},
+                                new KeyboardKey() {Identifier = KeyC},
+                                new KeyboardKey() {Identifier = KeyZ},
+
+                                new KeyboardKey() {Identifier = Digit1},
+                                new KeyboardKey() {Identifier = Digit2},
+                                new KeyboardKey() {Identifier = Digit3},
+
+                                new KeyboardKey() {Identifier = ArrowLeft},
+                                new KeyboardKey() {Identifier = ArrowUp},
+                                new KeyboardKey() {Identifier = ArrowRight},
+                                new KeyboardKey() {Identifier = ArrowDown},
+
+                                new KeyboardKey() {Identifier = KeyJ},
+                                new KeyboardKey() {Identifier = KeyI},
+                                new KeyboardKey() {Identifier = KeyL},
+                                new KeyboardKey() {Identifier = KeyK},
+
+                                new KeyboardKey() {Identifier = Slash},
+                                new KeyboardKey() {Identifier = Period},
+                                new KeyboardKey() {Identifier = Comma}
+                            }
+                        },
+                        Mouse = new MouseInput()
+                    };
+                }
             }
         }
 
@@ -293,9 +330,9 @@ namespace Domain.Model
             public int X { get; set; } = 0;
             public int Y { get; set; } = 0;
             public int ScrollWheel { get; set; } = 0;
-            public List<BtnState> LeftButton { get; set; } = null!;
-            public List<BtnState> MiddleButton { get; set; } = null!;
-            public List<BtnState> RightButton { get; set; } = null!;
+            public List<BtnState> LeftButton { get; set; } = new List<BtnState>();
+            public List<BtnState> MiddleButton { get; set; } = new List<BtnState>();
+            public List<BtnState> RightButton { get; set; } = new List<BtnState>();
         }
 
         public enum BtnState
