@@ -47,9 +47,10 @@ jobs:
     - name: tree (Debug)
       run: tree
 
-    - name: Commit wwwroot to GitHub Pages
+    # https://github.com/JamesIves/github-pages-deploy-action
+    - name: Commit wwwroot to a new branch called GithubPages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: xxx
+        BRANCH: GithubPages
         FOLDER: release/wwwroot
