@@ -20,6 +20,7 @@
         );
     
     public TileData.CharInfo[,]? DrawArea = null;
+    private DotNetObjectReference<Battleship>? dotNetHelper;
     
     public bool needToExit;
     public Input? CleanInput = null;
@@ -32,16 +33,11 @@
         while (game.GameData.ElapsedTime < 9000) {
             if (needToExit)
             {
-                throw new Exception("Game exited!");
+                return;
             }
             double deltaTime = (DateTime.Now - prevFrameTime).TotalSeconds;
             prevFrameTime = DateTime.Now;
-            if (CleanInput != null && CleanInput.Keyboard.KeyboardState.Find(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowUp.Key)!.Values.Count == 2)
-            {
-                Console.WriteLine("x: " + game.GameData.ActivePlayer.Sprite.Pos.X + " y:" + game.GameData.ActivePlayer.Sprite.Pos.Y);
-            }
-            game.GameData.Input = CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput();
-            CleanInput = null;
+            (game.GameData.Input, CleanInput) = (CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput(), null);
             new BlazorUpdateLogic(game.GameData.Input).Update(deltaTime, game);
             DrawArea = BlazorDrawLogic.GetDraw(deltaTime, game.GameData);
             StateHasChanged();
@@ -51,20 +47,53 @@
     
     protected override Task OnInitializedAsync()
     {
+        dotNetHelper = DotNetObjectReference.Create(this);
         DrawArea = BlazorDrawLogic.GetDraw(0.0f, game.GameData);
-        Run();
+        // Run();
         return Task.CompletedTask;
     }
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            GameBoardDiv.FocusAsync();
+            await GameBoardDiv.FocusAsync();
+            await jsRuntime.InvokeVoidAsync("runpixi");        
             // await jsRuntime.InvokeVoidAsync("JsFunctions.addKeyboardEventListener");
+            
+            int frameCount = 0;
+            while (true)
+            {
+                // await jsRuntime.InvokeVoidAsync("doNothing", new object[] { (object) System.Text.Json.JsonSerializer.Serialize(DrawArea!.ToJaggedArray())});
+                var drawArea = (from x in DrawArea!.ToJaggedArray() select (from y in x select y.ToString()).ToList()).ToList()!;
+                // await jsRuntime.InvokeVoidAsync("doNothing", new object[] { (object) System.Text.Json.JsonSerializer.Serialize(drawArea)});
+
+                // await jsRuntime.InvokeVoidAsync("pixiMain2", dotNetHelper);
+                // System.Text.Json.JsonSerializer.Serialize(DrawArea!.ToJaggedArray())
+                // var args = new object[] {(object) DrawArea!.ToJaggedArray()};
+                await jsRuntime.InvokeVoidAsync("pixiMain", drawArea);
+                // await jsRuntime.InvokeVoidAsync("printDate", dotNetHelper);
+                frameCount++;
+                Console.WriteLine(frameCount);
+                await Task.Delay(10);
+            }
         }
-        return Task.CompletedTask;
+
     }
+
+    [JSInvokable]
+    public string GetDrawArea()
+    {
+        var drawArea = (object) DrawArea!.ToJaggedArray();
+        return System.Text.Json.JsonSerializer.Serialize(drawArea);
+    }
+    
+    [JSInvokable]
+    public string GetDate()
+    {
+        return $"{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}, {DateTime.Now.Millisecond}";
+    }
+
 
     public void KeyDown(KeyboardEventArgs e)
     {
@@ -85,6 +114,7 @@
 
     public void Dispose()
     {
+        dotNetHelper?.Dispose();
         needToExit = true;
     }
 
@@ -116,43 +146,7 @@
     <form method="post">
         <div class="container" tabindex="0" @onkeydown="KeyDown" @onkeydown:preventDefault @ref="GameBoardDiv">
             <div class="row">
-                <div id="board" class="col capsizedText PressStart2PFont" style="font-size: 16px; line-height: 16px; padding: 0;">
-                    @{
-                    var ColorIntToCssString = new Dictionary<int, string>()
-                    {
-                        { 0, "rgb(12,     12,     12 )" },             // Black
-                        { 1, "rgb(0,      55,     218) " },            // DarkBlue
-                        { 2, "rgb(19,     161,    14  )" },            // DarkGreen
-                        { 3, "rgb(58,     150,    221) " },            // DarkCyan
-                        { 4, "rgb(197,    15,     31  )" },            // DarkRed
-                        { 5, "rgb(136,    23,     152) " },            // DarkMagenta
-                        { 6, "rgb(193,    156,    0  )" },             // DarkYellow
-                        { 7, "rgb(204,    204,    204) " },            // Gray
-                        { 8, "rgb(118,    118,    118) " },            // DarkGrey
-                        { 9, "rgb(59,     120,    255) " },            // Blue
-                        { 10, "rgb(22,    192,    12  )" },            // Green
-                        { 11, "rgb(97,    214,    214) " },            // Cyan
-                        { 12, "rgb(231,   72,     86  )" },            // Red
-                        { 13, "rgb(180,   0,      158) " },            // Magenta
-                        { 14, "rgb(249,   241,    165) " },            // Yellow
-                        { 15, "rgb(242,   242,    242) " }             // White
-                    };
-                    
-                    for (int y = 0; y < DrawArea.GetHeight(); y++)
-                    {
-                    <p style="display: flex; margin-top: 0; margin-bottom: 0;">
-                        @for (int x = 0; x < DrawArea.GetWidth(); x++)
-                        {
-                            var charInfo = DrawArea[y, x];
-                            var colCss = ColorIntToCssString[charInfo.Color.IntVal];
-                            var character = charInfo.Glyph;
-                            character = character == ' ' ? '.' : character;
-                            <em style="color: @colCss;">@character</em>
-                        }
-                    </p>
-                    }
-                    }
-                </div>
+                
             </div>
         </div>
         <br />

@@ -38,7 +38,7 @@
 
     public async void NewGame()
     {
-        GameData = new GameData();
+        this.GameData = new GameData();
         KeyboardEventArgs = null;
         nextTetrominos = new List<TetrominoStyle>();
         playAudio = true;
@@ -125,7 +125,7 @@
         {
             if (needToExit)
             {
-                throw new Exception("Game exited!");
+                return;
             }
             
             //Wait for the standard delay

@@ -239,7 +239,10 @@ namespace Domain.Tile
             public string GetGlyphString() => Glyph.ToString();
             public TileColor GetColor() => Color;
 
-            public override string ToString() => GetGlyphString();
+            public override string ToString()
+            {
+                return $"{GetGlyphString()}";
+            }
         }
     }
 }
