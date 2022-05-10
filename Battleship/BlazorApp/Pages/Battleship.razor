@@ -4,6 +4,7 @@
 @using Domain.Model.Api
 @using Domain
 @using Domain.Tile
+@using System.Text
 <h3>Canvas</h3>
 @inject IJSRuntime jsRuntime;
 @implements IDisposable
@@ -27,29 +28,18 @@
     public ElementReference GameBoardDiv;  // set by the @ref attribute
 
     
-    public async void Run()
+    public double RunNextFrame(DateTime prevFrameTime)
     {
-        var prevFrameTime = DateTime.Now;
-        while (game.GameData.ElapsedTime < 9000) {
-            if (needToExit)
-            {
-                return;
-            }
-            double deltaTime = (DateTime.Now - prevFrameTime).TotalSeconds;
-            prevFrameTime = DateTime.Now;
-            (game.GameData.Input, CleanInput) = (CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput(), null);
-            new BlazorUpdateLogic(game.GameData.Input).Update(deltaTime, game);
-            DrawArea = BlazorDrawLogic.GetDraw(deltaTime, game.GameData);
-            StateHasChanged();
-            await Task.Delay(Math.Max(1000 / 60 - (int) (deltaTime * 1000), 1));
-        }
+        double deltaTime = (DateTime.Now - prevFrameTime).TotalSeconds;
+        (game.GameData.Input, CleanInput) = (CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput(), null);
+        new BlazorUpdateLogic(game.GameData.Input).Update(deltaTime, game);
+        DrawArea = BlazorDrawLogic.GetDraw(deltaTime, game.GameData);
+        return deltaTime;
     }
     
     protected override Task OnInitializedAsync()
     {
         dotNetHelper = DotNetObjectReference.Create(this);
-        DrawArea = BlazorDrawLogic.GetDraw(0.0f, game.GameData);
-        // Run();
         return Task.CompletedTask;
     }
 
@@ -61,21 +51,23 @@
             await jsRuntime.InvokeVoidAsync("runpixi");        
             // await jsRuntime.InvokeVoidAsync("JsFunctions.addKeyboardEventListener");
             
-            int frameCount = 0;
-            while (true)
+            var prevFrameTime = DateTime.Now;
+            while (game.GameData.ElapsedTime < 9000 && !needToExit)
             {
+                var deltaTime = RunNextFrame(prevFrameTime);
+                prevFrameTime = prevFrameTime.AddSeconds(deltaTime);
+                
                 // await jsRuntime.InvokeVoidAsync("doNothing", new object[] { (object) System.Text.Json.JsonSerializer.Serialize(DrawArea!.ToJaggedArray())});
-                var drawArea = (from x in DrawArea!.ToJaggedArray() select (from y in x select y.ToString()).ToList()).ToList()!;
-                // await jsRuntime.InvokeVoidAsync("doNothing", new object[] { (object) System.Text.Json.JsonSerializer.Serialize(drawArea)});
-
+                var jaggedDraw = DrawArea!.ToJaggedArray();
+                var drawArea = (from row in jaggedDraw select (from tile in row select tile.ToString()).ToList()).ToList();
+                
+                
                 // await jsRuntime.InvokeVoidAsync("pixiMain2", dotNetHelper);
-                // System.Text.Json.JsonSerializer.Serialize(DrawArea!.ToJaggedArray())
-                // var args = new object[] {(object) DrawArea!.ToJaggedArray()};
-                await jsRuntime.InvokeVoidAsync("pixiMain", drawArea);
                 // await jsRuntime.InvokeVoidAsync("printDate", dotNetHelper);
-                frameCount++;
-                Console.WriteLine(frameCount);
-                await Task.Delay(10);
+                await jsRuntime.InvokeVoidAsync("pixiMain", (object) drawArea, game.GameData.FrameCount == 1);
+                Console.WriteLine(game.GameData.FrameCount);
+                
+                await Task.Delay(Math.Max(1000 / 60 - (int) (deltaTime * 1000), 1));
             }
         }
 
@@ -144,10 +136,7 @@
 
 
     <form method="post">
-        <div class="container" tabindex="0" @onkeydown="KeyDown" @onkeydown:preventDefault @ref="GameBoardDiv">
-            <div class="row">
-                
-            </div>
+        <div class="canvas-container" tabindex="0" @onkeydown="KeyDown" @onkeydown:preventDefault @ref="GameBoardDiv">
         </div>
         <br />
         <br />

@@ -71,9 +71,11 @@ app = null;
 
 window.runpixi = async () => {
     app = new PIXI.Application();
+    app.view.style.width = "800px";
+    app.view.style.height = "800px";
     // The application will create a canvas element for you that you
     // can then insert into the DOM
-    document.body.appendChild(app.view);
+    document.querySelector('.canvas-container').appendChild(app.view);
 
     // await app.loader.add('images/ps2p.fnt');
     
@@ -104,24 +106,41 @@ async function pixiMain2(dotNetHelper) {
     pixiMain(drawArea);
 }
 
-async function pixiMain(drawArea) {
+async function pixiMain(drawArea, isFirstRun) {
     // The application will create a renderer using WebGL, if possible,
     // with a fallback to a canvas render.
     // let drawArea = JSON.parse(drawAreaSer);
-    app.stage.removeChildren();  // removes previous stage effectively clearing the screen
+    
+    
+    /*
+    let start = performance.now();
+    let children = app.stage.removeChildren();  // removes previous stage effectively clearing the screen
+    for (const child of children) {
+        child.destroy(true);
+    }
+    
+     
+    console.log(`destroy took ${performance.now() - start} ms`)
+    
+     */
     for (let y = 0; y < drawArea.length; y++) {
         let row = drawArea[y];
         for (let x = 0; x < row.length; x++) {
             let tile = row[x];
-            let bitmapText = new PIXI.BitmapText(tile, {
-                fontName: "Press Start 2P",
-                fontSize: 24,
-                align: "right"
-            });
-            bitmapText.tint = '0x008000';
-            bitmapText.x = x * 24;
-            bitmapText.y = y * 24;
-            app.stage.addChild(bitmapText);
+            if (! isFirstRun) {
+                app.stage.children[y * row.length + x].text = tile;
+            } else {
+                let fontSize = 14;
+                let bitmapText = new PIXI.BitmapText(tile, {
+                    fontName: "Press Start 2P",
+                    fontSize: fontSize,
+                    align: "right"
+                });
+                bitmapText.tint = '0x008000';
+                bitmapText.x = x * fontSize;
+                bitmapText.y = y * fontSize;
+                app.stage.addChild(bitmapText);
+            }
         }
     }
 

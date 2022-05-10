@@ -11,7 +11,6 @@ using System.Text.Json;
 using Domain.Model;
 using RogueSharp;
 using Troschuetz.Random.Generators;
-using IrrKlang;
 using NUnit.Framework;
 using System.Text.Json.Serialization;
 using Domain.Model.Api;
@@ -329,22 +328,6 @@ namespace Tests
             }
         }
 
-        private static void SoundTest()
-        {
-            ISoundEngine engine = new ISoundEngine();
-            engine.Play2D("../../../../../media/Test/getout.ogg", true);
-            Console.Out.WriteLine("\nHello World");
-
-            do
-            {
-                Console.Out.WriteLine("Press any key to play some sound, press 'q' to quit.");
-
-                // play a single sound
-                engine.Play2D("../../../../../media/Test/bell.wav");
-            }
-            while(_getch() != 'q');
-        }
-        
         // some simple function for reading keys from the console
         [System.Runtime.InteropServices.DllImport("msvcrt")]
         static extern int _getch();
