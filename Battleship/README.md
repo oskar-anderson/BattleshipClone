@@ -54,7 +54,7 @@ This project is done for ICD0008 C# course the purpose of learning C#, databases
 - TGUI - SFML graphics plugin, https://tgui.eu/
 - c++ based toolkits: Qt, wxWidgets - require learning c++
 - ImGui https://github.com/mellinoe/ImGui.NET - UI toolkit, not what we are looking for
-- OpenTK - https://www.youtube.com/watch?v=X0uv8x0f70g
+- OpenTK - similar to SFML, but only focused on graphics, more low level, used by SFML under the hood, same Linux runtime DllNotFoundException.
 - wx.NET - wxWidgets C# port - last updated in 2011.
 
 

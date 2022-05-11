@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp", "BlazorApp\Blaz
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame", "MonoGame\MonoGame.csproj", "{E964B2C9-04F8-43E4-86B4-FDF17D98296E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTKProj", "OpenTKProj\OpenTKProj.csproj", "{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -188,6 +190,18 @@ Global
 		{E964B2C9-04F8-43E4-86B4-FDF17D98296E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E964B2C9-04F8-43E4-86B4-FDF17D98296E}.Release|x64.ActiveCfg = Release|Any CPU
 		{E964B2C9-04F8-43E4-86B4-FDF17D98296E}.Release|x64.Build.0 = Release|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug64|Any CPU.ActiveCfg = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug64|Any CPU.Build.0 = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug64|x64.ActiveCfg = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Debug64|x64.Build.0 = Debug|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{EACCF905-EDF1-49F6-8D74-F9937B2ACFCD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
