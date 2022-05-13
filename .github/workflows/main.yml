@@ -32,7 +32,7 @@ jobs:
         pwd        
         dotnet publish -c Release -o ../../release --nologo
         
-    - name: git log
+    - name: Add last git hash to index.html
       run: |
         git_hash=$(git --no-pager log -1 --oneline --format="%H")
         git_hash_8=${git_hash:0:8}
