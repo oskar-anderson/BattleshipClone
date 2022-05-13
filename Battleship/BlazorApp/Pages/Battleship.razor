@@ -24,14 +24,14 @@
     private DotNetObjectReference<Battleship>? dotNetHelper;
     
     public bool needToExit;
-    public Input? CleanInput = null;
+    public Input CleanInput = Input.GetDefaultInput();
     public ElementReference GameBoardDiv;  // set by the @ref attribute
 
     
     public double RunNextFrame(DateTime prevFrameTime)
     {
         double deltaTime = (DateTime.Now - prevFrameTime).TotalSeconds;
-        (game.GameData.Input, CleanInput) = (CleanInput ?? Input.KeyboardInput.KeyboardIdentifierList.GetDefaultInput(), null);
+        game.GameData.Input = CleanInput;
         new BlazorUpdateLogic(game.GameData.Input).Update(deltaTime, game);
         DrawArea = BlazorDrawLogic.GetDraw(deltaTime, game.GameData);
         return deltaTime;
@@ -89,7 +89,21 @@
 
     public void KeyDown(KeyboardEventArgs e)
     {
+        KeyEvent(e, true);
+    }
+
+    public void KeyUp(KeyboardEventArgs e)
+    {
+        KeyEvent(e, false);
+    }
+
+    public void FocusOut(FocusEventArgs e)
+    {
         CleanInput = Input.GetDefaultInput();
+    }
+
+    public void KeyEvent(KeyboardEventArgs e, bool isKeyDown)
+    {
         var supportedKeyboardEventCodes = (from x in Input.GetDefaultInput().Keyboard.KeyboardState select x.Identifier.Key).ToList();
         if (! supportedKeyboardEventCodes.Contains(e.Code))
         {
@@ -98,11 +112,17 @@
         Console.WriteLine(e.Code);
         CleanInput.Keyboard.KeyboardState.Find(
             x => x.Identifier.Key == e.Code)!
-            .Values = new List<Input.BtnState>()
-            {
-                Input.BtnState.Pressed, Input.BtnState.Echo
-            };
+            .Values = isKeyDown ?
+                new List<Input.BtnState>()
+                {
+                    Input.BtnState.Pressed, Input.BtnState.Echo
+                } :
+                new List<Input.BtnState>()
+                {
+                    Input.BtnState.Released
+                };
     }
+    
 
     public void Dispose()
     {
@@ -135,12 +155,21 @@
 
 
 
-    <form method="post">
-        <div class="canvas-container" tabindex="0" @onkeydown="KeyDown" @onkeydown:preventDefault @ref="GameBoardDiv">
-        </div>
-        <br />
-        <br />
+        <form method="post">
+            <!-- 
+            class="canvas-container" -> class is targeted in js by pixi.js
+            tabindex="0" -> otherwise focus can not be used
+            @onkeydown="KeyDown" -> handle keyboard key presses 
+            @onkeyup="KeyUp" -> handle keyboard key release, compliments onkeydown
+            @onfocusout="FocusOut" -> used to set input to default when focus is lost
+            @onkeydown:preventDefault -> disable browser built in keybinding. eg. down arrow scrolls page down
+            @ref="GameBoardDiv" -> used to target this element to set focus to it in blazor
+            -->
+            <div class="canvas-container" tabindex="0" @onkeydown="KeyDown" @onkeyup="KeyUp" @onfocusout="FocusOut" @onkeydown:preventDefault @ref="GameBoardDiv">
+            </div>
+            <br/>
+            <br/>
 
-    </form>
+        </form>
 
 </div>
