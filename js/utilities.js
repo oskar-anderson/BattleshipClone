@@ -70,9 +70,13 @@ console.log("utilities.js loaded");
 app = null;
 
 window.runpixi = async () => {
-    app = new PIXI.Application();
-    app.view.style.width = "800px";
-    app.view.style.height = "800px";
+    app = new PIXI.Application(
+        {
+            width: 800,
+            height: 600,
+            backgroundColor: 0xAAAAAA
+        }
+    );
     // The application will create a canvas element for you that you
     // can then insert into the DOM
     document.querySelector('.canvas-container').appendChild(app.view);
@@ -80,7 +84,9 @@ window.runpixi = async () => {
     // await app.loader.add('images/ps2p.fnt');
     
     return new Promise((resolve, reject) => {
-        app.loader.add('font/ps2p.fnt').load();
+        app.loader.add('font/ps2p.fnt');
+        app.loader.add('font/PressStart2P/PressStart2P.ttf');
+        app.loader.load();
         
         app.loader.onComplete.add(() => {
             resolve();
@@ -130,15 +136,32 @@ async function pixiMain(drawArea, isFirstRun) {
             if (! isFirstRun) {
                 app.stage.children[y * row.length + x].text = tile;
             } else {
+                let scale = 1;
                 let fontSize = 14;
+                
                 let bitmapText = new PIXI.BitmapText(tile, {
                     fontName: "Press Start 2P",
                     fontSize: fontSize,
                     align: "right"
                 });
-                bitmapText.tint = '0x008000';
-                bitmapText.x = x * fontSize;
-                bitmapText.y = y * fontSize;
+                bitmapText.tint = 0x008000;
+
+                /*
+                let bitmapText = new PIXI.Text(tile);
+                bitmapText.style = new PIXI.TextStyle(
+                    {
+                        fill: 0x008000,
+                        fontSize: fontSize,
+                        fontFamily: "Press Start 2P"
+                    }
+                )
+                */
+                 
+                bitmapText.x = x * fontSize * scale;
+                bitmapText.y = y * fontSize * scale;
+                // todo: add scale support
+                bitmapText.scale.x = scale;
+                bitmapText.scale.y = scale;
                 app.stage.addChild(bitmapText);
             }
         }
