@@ -12,6 +12,9 @@ namespace MonoGame
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferHeight = 480;
+            _graphics.PreferredBackBufferWidth = 640;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
