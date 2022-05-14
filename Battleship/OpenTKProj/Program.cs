@@ -10,15 +10,19 @@ namespace OpenTKProj
     {
         public static void Main(string[] args)
         {
+            GLFW.glfw(Array.Empty<string>());
             Console.WriteLine("Hello, World!");
 
-            /*
+            /* Linux:
              *
              * Unhandled exception. System.TypeInitializationException: The type initializer for 'OpenTK.Windowing.Desktop.NativeWindowSettings' threw an exception.
                 ---> System.DllNotFoundException: Unable to load shared library 'glfw' or one of its dependencies. In order to help diagnose loading problems, consider setting the LD_DEBUG environment variable: libglfw: cannot open shared object file: No such file or directory
              * 
              */
             // https://github.com/opentk/opentk/issues/1064
+            
+            // Windows:
+            // Unhandled exception. OpenTK.Windowing.GraphicsLibraryFramework.GLFWException: WGL: Driver does not support OpenGL version 4.7
             GameWindowSettings gws = GameWindowSettings.Default;
             NativeWindowSettings nws = NativeWindowSettings.Default;
 
