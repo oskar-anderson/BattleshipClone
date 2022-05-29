@@ -112,6 +112,13 @@ async function pixiMain2(dotNetHelper) {
     pixiMain(drawArea);
 }
 
+function rgbToHex(r, g, b) {
+    return "0x" + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    }).join('');
+}
+
 async function pixiMain(drawArea, isFirstRun) {
     // The application will create a renderer using WebGL, if possible,
     // with a fallback to a canvas render.
