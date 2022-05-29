@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Model
 {
@@ -19,125 +20,125 @@ namespace Domain.Model
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyR,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyX,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Escape,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyC,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyZ,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Digit1,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Digit2,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Digit3,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyA,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyW,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyD,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyS,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.ArrowLeft,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.ArrowUp,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.ArrowRight,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.ArrowDown,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyJ,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyI,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyL,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.KeyK,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Slash,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Period,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                         new KeyboardInput.KeyboardKey()
                         {
                             Identifier = KeyboardInput.KeyboardIdentifierList.Comma,
-                            Values = new List<BtnState>()
+                            Value = BtnState.Released
                         },
                     }
                 },
                 Mouse = new MouseInput()
                 {
-                    LeftButton = new List<BtnState>(),
-                    MiddleButton = new List<BtnState>(),
-                    RightButton = new List<BtnState>(),
+                    LeftButton = BtnState.Released,
+                    MiddleButton = BtnState.Released,
+                    RightButton = BtnState.Released,
                     ScrollWheel = 0,
                     X = 0,
                     Y = 0
@@ -153,7 +154,27 @@ namespace Domain.Model
             public class KeyboardKey
             {
                 public KeyboardIdentifier Identifier { get; set; } = null!;
-                public List<BtnState> Values { get; set; } = new();
+                public BtnState Value { get; set; } = BtnState.Released;
+
+                public bool IsPressed()
+                {
+                    return this.Value == BtnState.Pressed;
+                }
+                
+                public bool IsEcho()
+                {
+                    return this.Value == BtnState.Echo;
+                }
+                
+                public bool IsReleased()
+                {
+                    return this.Value == BtnState.Released;
+                }
+
+                public bool IsDown()
+                {
+                    return Value is BtnState.Pressed or BtnState.Echo;
+                }
             }
     
             public class KeyboardIdentifier
@@ -323,6 +344,15 @@ namespace Domain.Model
                     };
                 }
             }
+            
+            public void HandelKeyboardEcho()
+            {
+                var pressedKeys = KeyboardState.Where(x => x.IsPressed());
+                foreach (var keyboardKey in pressedKeys)
+                {
+                    keyboardKey.Value = BtnState.Echo;
+                }
+            }
         }
 
         public class MouseInput
@@ -330,9 +360,14 @@ namespace Domain.Model
             public int X { get; set; } = 0;
             public int Y { get; set; } = 0;
             public int ScrollWheel { get; set; } = 0;
-            public List<BtnState> LeftButton { get; set; } = new List<BtnState>();
-            public List<BtnState> MiddleButton { get; set; } = new List<BtnState>();
-            public List<BtnState> RightButton { get; set; } = new List<BtnState>();
+            public BtnState LeftButton { get; set; } = BtnState.Released;
+            public BtnState MiddleButton { get; set; } = BtnState.Released;
+            public BtnState RightButton { get; set; } = BtnState.Released;
+
+            public bool IsPressed(BtnState btnState)
+            {
+                return btnState == BtnState.Pressed;
+            }
         }
 
         public enum BtnState

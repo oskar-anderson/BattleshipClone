@@ -120,6 +120,16 @@ namespace Tests
 
         private static void RandomTimeTest()
         {
+            /*
+             * NR3Generator         00:00:00.0871916
+               NR3Q1Generator       00:00:00.0345322
+               NR3Q2Generator       00:00:00.0508724
+               StandardGenerator    00:00:00.5778066
+               XorShift128Generator 00:00:00.0365964
+               System Random        00:00:01.6143557
+
+             */
+            
             int upLimit = 1000 * 1000;
             var stopwatch = Stopwatch.StartNew();
 /*

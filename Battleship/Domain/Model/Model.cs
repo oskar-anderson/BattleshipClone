@@ -72,6 +72,7 @@ namespace Domain.Model
         public string UI_Message { get; set; } = string.Empty;
         public List<DialogItem> UI_DialogOptions { get; set; } = new List<DialogItem>();
         
+
         public struct DialogItem
         {
             public bool isActive;

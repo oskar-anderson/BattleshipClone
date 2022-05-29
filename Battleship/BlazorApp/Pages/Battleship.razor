@@ -65,7 +65,7 @@
                 // await jsRuntime.InvokeVoidAsync("pixiMain2", dotNetHelper);
                 // await jsRuntime.InvokeVoidAsync("printDate", dotNetHelper);
                 await jsRuntime.InvokeVoidAsync("pixiMain", (object) drawArea, game.GameData.FrameCount == 1);
-                Console.WriteLine(game.GameData.FrameCount);
+                // Console.WriteLine(game.GameData.FrameCount);
                 
                 await Task.Delay(Math.Max(1000 / 60 - (int) (deltaTime * 1000), 1));
             }
@@ -109,18 +109,26 @@
         {
             return;
         }
-        Console.WriteLine(e.Code);
-        CleanInput.Keyboard.KeyboardState.Find(
-            x => x.Identifier.Key == e.Code)!
-            .Values = isKeyDown ?
-                new List<Input.BtnState>()
-                {
-                    Input.BtnState.Pressed, Input.BtnState.Echo
-                } :
-                new List<Input.BtnState>()
-                {
-                    Input.BtnState.Released
-                };
+        var keyboardKey = CleanInput.Keyboard.KeyboardState.Find(
+            x => x.Identifier.Key == e.Code)!;
+        if (isKeyDown)
+        {
+            if (keyboardKey.IsDown())
+            {
+                keyboardKey.Value = Input.BtnState.Echo;
+            }
+            if (keyboardKey.IsReleased())
+            {
+                keyboardKey.Value = Input.BtnState.Pressed;
+            }
+        }
+        else
+        {
+            keyboardKey.Value = Input.BtnState.Released;
+        }
+        Console.WriteLine($"{keyboardKey.Identifier.Key} {nameof(isKeyDown)}={isKeyDown}, " +
+                          $"{nameof(keyboardKey.Value)}={keyboardKey.Value}");
+        
     }
     
 

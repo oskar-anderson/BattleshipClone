@@ -24,17 +24,17 @@ namespace Game
           {
              if (!basegame.GameData.Input.Keyboard.KeyboardState
                     .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyZ.Key && 
-                              x.Values.Contains(Input.BtnState.Pressed)) 
+                              x.IsPressed()) 
                  && !basegame.GameData.Input.Keyboard.KeyboardState
                     .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.Escape.Key && 
-                              x.Values.Contains(Input.BtnState.Pressed)) 
+                              x.IsPressed()) 
                  ) return true;
              return false;
           }
 
           if (basegame.GameData.Input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.Escape.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed))
+                       x.IsPressed())
              )
           {
              return false;
@@ -51,6 +51,7 @@ namespace Game
           HandleKeyboardPanning(deltaTime, basegame.GameData.ActivePlayer, basegame.GameData.Input);
           HandleMousePanning(basegame.GameData.ActivePlayer, basegame.GameData.Input);
           HandleMouseSelection(basegame.GameData.ActivePlayer, basegame.GameData.Input);
+          basegame.GameData.Input.Keyboard.HandelKeyboardEcho();
           
           return true;
        }
@@ -82,8 +83,7 @@ namespace Game
 
                 if (activeKeys[dialogStart].isActive && gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == dialogStart.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo))
+                                 x.IsPressed())
                     )
                 {
                    (gameData.ActivePlayer, gameData.InactivePlayer) = (gameData.InactivePlayer, gameData.ActivePlayer);
@@ -113,8 +113,7 @@ namespace Game
                           
                 if (activeKeys[dialogRandomize].isActive && gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == dialogRandomize.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo)))
+                                 x.IsPressed()))
                 {
                    string[,] refreshedBoard = TileFunctions.GetRndSeaTiles(
                       gameData.ActivePlayer.BoardBounds.Width, 
@@ -140,8 +139,7 @@ namespace Game
 
                 if (activeKeys[dialogClear].isActive && gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == dialogClear.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo))
+                                 x.IsPressed())
                     )
                 {
                    gameData.ActivePlayer.Ships.Clear();
@@ -156,8 +154,7 @@ namespace Game
                 if (shipPlacementStatus.isPlaceable && activeKeys[dialogAction].isActive && 
                     gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == dialogAction.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo))
+                                 x.IsPressed())
                     )
                 {
                    if (shipPlacementStatus.modelPoints == null || shipPlacementStatus.hitboxRect == null) { throw new Exception("Unexpected!");}
@@ -168,8 +165,7 @@ namespace Game
 
                 if (activeKeys[dialogRot].isActive && gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == dialogRot.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo))
+                                 x.IsPressed())
                     )
                 {
                    gameData.ActivePlayer.IsHorizontalPlacement = !gameData.ActivePlayer.IsHorizontalPlacement;
@@ -181,8 +177,7 @@ namespace Game
                 string selectedOppTileValue = gameData.Board2D.Get(gameData.ActivePlayer.Sprite.Pos);
                 if (gameData.Input.Keyboard.KeyboardState
                        .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyZ.Key && 
-                                 x.Values.Contains(Input.BtnState.Pressed) && 
-                                 ! x.Values.Contains(Input.BtnState.Echo)) && 
+                                 x.IsPressed()) && 
                     !(TextureValue.HitShip == selectedOppTileValue || 
                       TextureValue.HitWater == selectedOppTileValue)
                     )
@@ -247,8 +242,7 @@ namespace Game
 
                 if (gameData.Input.Keyboard.KeyboardState
                       .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyR.Key && 
-                                x.Values.Contains(Input.BtnState.Pressed) && 
-                                ! x.Values.Contains(Input.BtnState.Echo))
+                                x.IsPressed())
                     && gameData.ActivePlayer.ShootingHistory.Count != 0)
                 {
                    ShootingHistoryItem historyItem = gameData.ActivePlayer.ShootingHistory.Last();
@@ -418,10 +412,10 @@ namespace Game
           Rectangle bounds = new Rectangle(0,0, board.GetWidth(), board.GetHeight());
           if (input.Keyboard.KeyboardState
                  .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyA.Key && 
-                           x.Values.Contains(Input.BtnState.Pressed) 
+                           x.IsDown()
                            || 
                            x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowLeft.Key && 
-                           x.Values.Contains(Input.BtnState.Pressed)
+                           x.IsDown()
                            )
           )
           {
@@ -438,10 +432,10 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
                 .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyS.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed) 
+                          x.IsDown()
                           || 
                           x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowDown.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed)
+                          x.IsDown()
                 )
              )
           {
@@ -458,10 +452,10 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
                 .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyD.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed) 
+                          x.IsDown()
                           || 
                           x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowRight.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed)
+                          x.IsDown()
                 )
              )
           {
@@ -478,10 +472,10 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
                 .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyW.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed) 
+                          x.IsDown()
                           || 
                           x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.ArrowUp.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed)
+                          x.IsDown()
                 )
              )
           {
@@ -597,7 +591,7 @@ namespace Game
        {
           if (input.Keyboard.KeyboardState
                 .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyJ.Key && 
-                          x.Values.Contains(Input.BtnState.Pressed) 
+                          x.IsPressed()
                 )
              )
           {
@@ -606,7 +600,7 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyK.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed) 
+                       x.IsPressed()
              )
           )
           {
@@ -615,7 +609,7 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyL.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed) 
+                       x.IsPressed() 
              )
           )
           {
@@ -624,7 +618,7 @@ namespace Game
 
           if (input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.KeyI.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed) 
+                       x.IsPressed()
              )
           )
           {
@@ -635,7 +629,7 @@ namespace Game
        private static void HandleMousePanning(Player player, Input input)
        {
           var mousePos = new Point(input.Mouse.X, input.Mouse.Y);
-          if (!input.Mouse.LeftButton.Contains(Input.BtnState.Pressed))
+          if (input.Mouse.LeftButton != Input.BtnState.Pressed)
           {
              player.pMouseStartPixelPan = mousePos;
              return;
@@ -651,10 +645,10 @@ namespace Game
        {
           bool zoomNegative = input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.Period.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed));
+                       x.IsPressed());
           bool zoomPositive = input.Keyboard.KeyboardState
              .Any(x => x.Identifier.Key == Input.KeyboardInput.KeyboardIdentifierList.Comma.Key && 
-                       x.Values.Contains(Input.BtnState.Pressed));
+                       x.IsPressed());
           if (! zoomNegative && ! zoomPositive)
           {
              return;
@@ -694,7 +688,7 @@ namespace Game
 
        private static void HandleMouseSelection(Player player, Input input)
        {
-          if (!input.Mouse.LeftButton.Contains(Input.BtnState.Pressed)) return;
+          if (input.Mouse.LeftButton != Input.BtnState.Pressed) return;
           var mousePos = new Point(input.Mouse.X, input.Mouse.Y);
           float fMouseWorldX, fMouseWorldY;
           ScreenToWorld(

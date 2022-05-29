@@ -105,11 +105,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyA,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -117,11 +113,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyD,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -129,11 +121,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyW,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -141,11 +129,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyS,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -153,11 +137,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyZ,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -165,11 +145,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyX,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -177,11 +153,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.Digit1,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -189,11 +161,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.Digit2,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -201,11 +169,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.Digit3,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 
@@ -213,11 +177,7 @@ namespace WebApp.Pages.Battleship
                     keyboardKeys.Add(new Input.KeyboardInput.KeyboardKey()
                     {
                         Identifier = Input.KeyboardInput.KeyboardIdentifierList.KeyR,
-                        Values = new List<Input.BtnState>()
-                        {
-                            Input.BtnState.Pressed,
-                            Input.BtnState.Echo
-                        }
+                        Value = Input.BtnState.Pressed
                     });
                     break;
                 default:
@@ -231,9 +191,9 @@ namespace WebApp.Pages.Battleship
                 },
                 Mouse = new Input.MouseInput()
                 {
-                    LeftButton = new List<Input.BtnState>() { Input.BtnState.Released },
-                    MiddleButton = new List<Input.BtnState>() { Input.BtnState.Released },
-                    RightButton = new List<Input.BtnState>() { Input.BtnState.Released },
+                    LeftButton = Input.BtnState.Released,
+                    MiddleButton = Input.BtnState.Released,
+                    RightButton = Input.BtnState.Released,
                     ScrollWheel = 0,
                     X = 0,
                     Y = 0

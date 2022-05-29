@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain;
 using Domain.Model;
-using Troschuetz.Random.Generators;
 using Rectangle = RogueSharp.Rectangle;
 using Point = RogueSharp.Point;
 
@@ -99,7 +98,7 @@ namespace Game.Pack
         
         private static int RandomGen(int max)
         {
-            XorShift128Generator generator = new XorShift128Generator();
+            var generator = new Random();
             return generator.Next() % max;
         }
 

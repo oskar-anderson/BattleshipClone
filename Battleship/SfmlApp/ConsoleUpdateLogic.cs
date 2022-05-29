@@ -1,3 +1,4 @@
+using Domain.Model;
 using Game;
 using SFML.Graphics;
 
@@ -14,7 +15,7 @@ public class ConsoleUpdateLogic : UpdateLogic
     
     public override bool Update(double deltaTime, BaseBattleship basegame)
     {
-        basegame.GameData.Input = new ConsoleInput(Window).UpdateInput(basegame.GameData.Input);
+        basegame.GameData.Input = Window.HasFocus() ? new ConsoleInput(Window).UpdateInput(basegame.GameData.Input) : Input.GetDefaultInput();
         return base.Update(deltaTime, basegame);
     }
 }
