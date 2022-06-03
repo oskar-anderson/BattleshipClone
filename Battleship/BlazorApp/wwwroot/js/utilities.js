@@ -82,16 +82,19 @@ window.runpixi = async () => {
     document.querySelector('.canvas-container').appendChild(app.view);
 
     // await app.loader.add('images/ps2p.fnt');
+    app.loader.add('font/ps2p.fnt');
+    app.loader.add('font/PressStart2P/PressStart2P.ttf');
     
     return new Promise((resolve, reject) => {
-        app.loader.add('font/ps2p.fnt');
-        app.loader.add('font/PressStart2P/PressStart2P.ttf');
+        console.log("app.loader loading...");
         app.loader.load();
         
         app.loader.onComplete.add(() => {
+            console.log("app.loader resolve");
             resolve();
         })
         app.loader.onError.add(() => {
+            console.log("app.loader onError");
             reject();
         })
     });
@@ -119,11 +122,19 @@ function rgbToHex(r, g, b) {
     }).join('');
 }
 
-async function pixiMain(drawArea, isFirstRun) {
+async function getTime() {
+    return Date.now().toString();
+}
+
+function pixiMain(drawArea, isFirstRun, isJson, isUnmarshalled) {
     // The application will create a renderer using WebGL, if possible,
     // with a fallback to a canvas render.
-    // let drawArea = JSON.parse(drawAreaSer);
-    
+    drawArea = isUnmarshalled ? BINDING.conv_string(drawArea) : drawArea;       // Convert the handle to a JS string
+    drawArea = isJson ? JSON.parse(drawArea) : drawArea;
+    if (isFirstRun) {
+        console.log("in pixiMain");
+        console.log(app.stage.children);
+    }
     
     /*
     let start = performance.now();
@@ -141,17 +152,17 @@ async function pixiMain(drawArea, isFirstRun) {
         for (let x = 0; x < row.length; x++) {
             let tile = row[x];
             if (! isFirstRun) {
-                app.stage.children[y * row.length + x].text = tile;
+                app.stage.children[y * row.length + x].text = tile[0];
             } else {
                 let scale = 1;
                 let fontSize = 14;
-                
-                let bitmapText = new PIXI.BitmapText(tile, {
+                let bitmapText = new PIXI.BitmapText(tile[0], {
                     fontName: "Press Start 2P",
                     fontSize: fontSize,
                     align: "right"
                 });
                 bitmapText.tint = 0x008000;
+                // bitmapText.tint = rgbToHex(tile[1], tile[2], tile[3]);
 
                 /*
                 let bitmapText = new PIXI.Text(tile);

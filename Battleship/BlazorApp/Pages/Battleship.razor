@@ -5,9 +5,13 @@
 @using Domain
 @using Domain.Tile
 @using System.Text
+@using System.Net.Mime
+@using System.Numerics
+@using System.Text.Json
 <h3>Canvas</h3>
 @inject IJSRuntime jsRuntime;
 @implements IDisposable
+@inject IJSUnmarshalledRuntime JSUnmarshalledRuntime
 
 @code {
 
@@ -48,7 +52,11 @@
         if (firstRender)
         {
             await GameBoardDiv.FocusAsync();
-            await jsRuntime.InvokeVoidAsync("runpixi");        
+            var unmarshalledJs = (IJSUnmarshalledRuntime) JSUnmarshalledRuntime;
+            unmarshalledJs.InvokeUnmarshalled<string>("runpixi");
+            await Task.Delay(1000);
+            // await jsRuntime.InvokeVoidAsync("runpixi");
+            
             // await jsRuntime.InvokeVoidAsync("JsFunctions.addKeyboardEventListener");
             
             var prevFrameTime = DateTime.Now;
@@ -58,16 +66,103 @@
                 prevFrameTime = prevFrameTime.AddSeconds(deltaTime);
                 
                 // await jsRuntime.InvokeVoidAsync("doNothing", new object[] { (object) System.Text.Json.JsonSerializer.Serialize(DrawArea!.ToJaggedArray())});
-                var jaggedDraw = DrawArea!.ToJaggedArray();
-                var drawArea = (from row in jaggedDraw select (from tile in row select tile.ToString()).ToList()).ToList();
+                
+                string drawDataString = "";
+                List<List<string>> drawDataList = default!;
+                var method = 5;
+                TileData.CharInfo[][]? jaggedDraw;
+                Func<bool, string> GetJsonUsingSB = (isfull) =>
+                {
+                    var sb = new StringBuilder();
+                    sb.Append("[");
+                    for (var i = 0; i < DrawArea.GetHeight(); i++)
+                    {
+                        sb.Append("[");
+                        for (var j = 0; j < DrawArea.GetWidth(); j++)
+                        {
+                            var charInfo = DrawArea[i, j];
+
+                            sb.Append(isfull ? $"[\"{charInfo.Glyph}\",\"{charInfo.Color.RgbR}\",\"{charInfo.Color.RgbG}\",\"{charInfo.Color.RgbB}\"]" : $"\"{charInfo.Glyph}\"");
+                            
+                            if (j != DrawArea.GetWidth() - 1)
+                            {
+                                sb.Append(",");
+                            }
+                        }
+                        sb.Append("]");
+                        if (i != DrawArea.GetHeight() - 1)
+                        {
+                            sb.Append(",");
+                        }
+                    }
+                    sb.Append("]");
+                    drawDataString = sb.ToString();
+                    return drawDataString;
+                };
+                switch (method)
+                {
+                    case 1: // fps: 11
+                        var s1 = GetJsonUsingSB(true);
+                        await jsRuntime.InvokeVoidAsync("pixiMain", s1, game.GameData.FrameCount == 1, true, false);
+                        break;
+                    case 2: // fps: 26
+                        var s2 = GetJsonUsingSB(false);
+                        await jsRuntime.InvokeVoidAsync("pixiMain", s2, game.GameData.FrameCount == 1, true, false);
+                        break;
+                    case 3: // fps: 28
+                        jaggedDraw = DrawArea!.ToJaggedArray();
+                        drawDataList =(from row in jaggedDraw select (from tile in row select $"{tile.Glyph}").ToList()).ToList();
+                        await jsRuntime.InvokeVoidAsync("pixiMain", drawDataList, game.GameData.FrameCount == 1, false, false);
+                        break;
+                    case 4: // fps: 22
+                        jaggedDraw = DrawArea!.ToJaggedArray(); // fps: 67 => 62   
+                        var x4 = (from row in jaggedDraw select (from tile in row select $"{tile.Glyph}").ToList()).ToList(); // fps: 62 => 39   
+                        drawDataString = JsonSerializer.Serialize(x4);  // fps: 39 => 29
+                        await jsRuntime.InvokeVoidAsync("pixiMain", drawDataString, game.GameData.FrameCount == 1, true, false); // fps: 29 => 22
+                        break;
+                    case 5: // fps: 38
+                        jaggedDraw = DrawArea!.ToJaggedArray(); // fps: 66 => 62
+                        
+                        var outerList = new List<List<char>>();
+                        foreach (var row in jaggedDraw)
+                        {
+                            var innerList = new List<char>();
+                            outerList.Add(innerList);
+                            // innerList.AddRange(row.Select(charInfo => charInfo.Glyph)); This is slower
+                            foreach (var charInfo in row)
+                            {
+                                innerList.Add(charInfo.Glyph);
+                            }
+                        } // fps: 62 => 59
+                        var start = BigInteger.Parse(await jsRuntime.InvokeAsync<string>("getTime"));
+                        // await jsRuntime.InvokeVoidAsync("pixiMain", outerList, game.GameData.FrameCount == 1, false, false);  // fps: 59 => 38
+                        var end = BigInteger.Parse(await jsRuntime.InvokeAsync<string>("getTime"));
+                        Console.WriteLine(end - start);
+                        break;
+                    case 6: 
+                        jaggedDraw = DrawArea!.ToJaggedArray(); // fps: 67 => 62   
+                        var x6 = (from row in jaggedDraw select (from tile in row select $"{tile.Glyph}").ToList()).ToList(); // fps: 62 => 39   
+                        drawDataString = JsonSerializer.Serialize(x6);  // fps: 39 => 29
+                        unmarshalledJs.InvokeUnmarshalled<string, bool, string>("pixiMain", drawDataString, game.GameData.FrameCount == 1); // fps: 29 => 28
+                        break;
+                    default:
+                        break;
+                        // throw new NotImplementedException($"Method {method} not implemented!");
+                }
                 
                 
                 // await jsRuntime.InvokeVoidAsync("pixiMain2", dotNetHelper);
                 // await jsRuntime.InvokeVoidAsync("printDate", dotNetHelper);
-                await jsRuntime.InvokeVoidAsync("pixiMain", (object) drawArea, game.GameData.FrameCount == 1);
-                // Console.WriteLine(game.GameData.FrameCount);
+                // fps without drawing: 55
+                // await jsRuntime.InvokeVoidAsync("pixiMain", (object) drawArea, game.GameData.FrameCount == 1);
+                // await jsRuntime.InvokeVoidAsync("pixiMain", drawDataString, game.GameData.FrameCount == 1);
                 
-                await Task.Delay(Math.Max(1000 / 60 - (int) (deltaTime * 1000), 1));
+                // unmarshalledJs.InvokeUnmarshalled<string, bool, string>("pixiMain", (string) drawData,game.GameData.FrameCount == 1);
+                // Console.WriteLine(game.GameData.FrameCount);
+
+                var nDeltaTime = (int) Math.Floor(deltaTime * 1000);
+                var delay = Math.Max(1000 / 60 - nDeltaTime, 1);
+                await Task.Delay(delay);
             }
         }
 
@@ -143,7 +238,7 @@
 <div class="main">
     <h2>Battleship</h2>
     <div>
-        FrameCount: @game.GameData.FrameCount
+        FrameCount: @game.GameData.FrameCount, FPS: @(game.GameData.DeltaTimes.Count == 0 ? 0 : 1 / game.GameData.DeltaTimes.Average());
     </div>
 
 
